@@ -1,0 +1,159 @@
+{
+  "userId": "user_1",
+  "useEquivalents": true,
+  "targets": [
+    {
+      "id": "1",
+      "name": "Capital Preservation I",
+      "groups": [
+        "Set 1"
+      ],
+      "allocation": [
+        {
+          "weight": 0.3,
+          "categoryId": "4"
+        },
+        {
+          "weight": 0.25,
+          "categoryId": "2"
+        },
+        {
+          "weight": 0.45,
+          "categoryId": "6"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "Capital Preservation II",
+      "groups": [
+        "Set 1"
+      ],
+      "allocation": [
+        {
+          "weight": 0.6,
+          "categoryId": "1"
+        },
+        {
+          "weight": 0.4,
+          "categoryId": "2"
+        }
+      ]
+    }
+  ],
+  "portfolio": {
+    "id": "portfolio_1",
+    "name": "John Smiths Portfolio",
+    "capitalGainsTax": 0.15,
+    "ordinaryIncomeTax": 0.3635,
+    "targetAllocation": [
+      {
+        "weight": 0.04,
+        "categoryId": "1"
+      },
+      {
+        "weight": 0.26,
+        "categoryId": "2"
+      },
+      {
+        "weight": 0.20,
+        "categoryId": "3"
+      },
+      {
+        "weight": 0.14,
+        "categoryId": "6"
+      },
+      {
+        "weight": 0.36,
+        "categoryId": "7"
+      }
+    ],
+    "accounts": [
+      {
+        "id": "account_1",
+        "name": "Joint Account",
+        "taxabilityType": "T",
+        "excluded": true,
+        "locked": false,
+        "heldaway": false,
+        "clients": [
+          {
+            "id": "client_1",
+            "name": "John Smith"
+          },
+          {
+            "id": "client_2",
+            "name": "Jane Smith"
+          }
+        ],
+        "holdings": [
+          {
+            "categoryId": "1",
+            "symbol": "A",
+            "balance": 575000,
+            "taxLotId": "taxlot_1",
+            "locked": false,
+            "name": "A"
+          }
+        ]
+      },
+      {
+        "id": "account_2",
+        "name": "Traditional IRA",
+        "taxabilityType": "D",
+        "excluded": false,
+        "locked": true,
+        "heldaway": false,
+        "clients": [
+          {
+            "id": "client_1",
+            "name": "John Smith"
+          },
+          {
+            "id": "client_2",
+            "name": "Jane Smith"
+          }
+        ],
+        "holdings": [
+          {
+            "categoryId": "2",
+            "symbol": "B",
+            "name": "B",
+            "balance": 325000,
+            "taxLotId": "taxlot_1",
+            "locked": false
+            
+          }
+        ]
+      },
+      {
+        "id": "account_3",
+        "name": "Roth IRA",
+        "taxabilityType": "F",
+        "excluded": false,
+        "locked": false,
+        "heldaway": false,
+        "clients": [
+          {
+            "id": "client_1",
+            "name": "John Smith"
+          },
+          {
+            "id": "client_2",
+            "name": "Jane Smith"
+          }
+        ],
+        "holdings": [
+          {
+            "categoryId": "3",
+            "symbol": "C",
+            "name": "C",
+            "balance": 80000,
+            "taxLotId": "taxlot_1",
+            "locked": false
+          }
+        ]
+      }
+    ]
+  }
+}

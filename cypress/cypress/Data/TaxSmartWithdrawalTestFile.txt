@@ -1,0 +1,791 @@
+{
+    "userId": "50B85F5DD76647909ECBE3D69334AD96",
+    "targets": [
+        {
+            "id": "1",
+            "name": "Capital Preservation I",
+            "groups": [
+                "Set 1"
+            ],
+            "allocation": [
+                {
+                    "categoryId": "1",
+                    "weight": 1
+                }
+            ]
+        }
+    ],
+    "useEquivalents": true,
+    "portfolio": {
+        "id": "aa502195-1ee4-49b0-a80f-af1600b5db3d",
+        "name": "TAXABLE BROKARAGE JOHN'S ACCOUNT",
+        "ordinaryIncomeTax": 0.4,
+        "capitalGainsTax": 0.2,
+        "targetAllocation":[
+                {
+                    "categoryId": "2",
+                    "weight": 0.02
+                },
+                {
+                    "categoryId": "5",
+                    "weight": 0.38
+                },
+                {
+                    "categoryId": "7",
+                    "weight": 0.3
+                },
+                {
+                    "categoryId": "10",
+                    "weight": 0.295
+                },
+                {
+                    "categoryId": "B3B9D2C612EC418A818628861BC21D36",
+                    "weight": 0.005
+                }
+            ],
+        "accounts": [
+            {
+                "id": "1-aa502195",
+                "name": "TAXABLE ACCOUNT 1",
+                "taxabilityType": "T",
+                "locked": false,
+                "heldaway": false,
+                "clients":[
+                    {
+                        "id": "1",
+                        "name": "Hasan"
+                    }
+                ],
+                "holdings": [
+                    {
+                        "symbol": "AAPL",
+                        "name": "AAPL",
+                        "taxlotId": "1",
+                        "purchaseDate": "2018-07-25",
+                        "categoryId": "1",
+                        "locked": true,
+                        "costBasis": 5000,
+                        "balance": 10000
+                    },
+                    {
+                        "symbol": "NVDA",
+                        "name": "NVDA",
+                        "taxlotId": "1",
+                        "purchaseDate": "2015-07-25",
+                        "categoryId": "2",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 10000
+                    },
+                    {
+                        "symbol": "NVDA",
+                        "name": "NVDA",
+                        "taxlotId": "2",
+                        "categoryId": "2",
+                        "locked": false,
+                        "costBasis": 1000,
+                        "balance": 5000
+                    },
+                    {
+                        "symbol": "NVDA",
+                        "name": "NVDA",
+                        "taxlotId": "3",
+                        "categoryId": "2",
+                        "locked": false,
+                        "costBasis": 8000,
+                        "balance": 5000
+                    },
+                    {
+                        "symbol": "KAMAA",
+                        "name": "KAMAA",
+                        "taxlotId": "1",
+                        "purchaseDate": "2018-07-25",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 4000,
+                        "allocation":[
+                            {
+                                "categoryId": "6",
+                                "weight": 1
+                            }
+                        ]
+                    },
+                    {
+                        "symbol": "KAMAA",
+                        "name": "KAMAA",
+                        "taxlotId": "2",
+                        "locked": true,
+                        "costBasis": 7000,
+                        "balance": 4000,
+                        "allocation":[
+                            {
+                                "categoryId": "6",
+                                "weight": 1
+                            }
+                        ]
+                    },
+                    {
+                        "symbol": "KAMAA",
+                        "name": "KAMAA",
+                        "taxlotId": "3",
+                        "purchaseDate": "2001-07-25",
+                        "locked": false,
+                        "costBasis": 10000,
+                        "balance": 15000,
+                        "allocation":[
+                            {
+                                "categoryId": "6",
+                                "weight": 1
+                            }
+                        ]
+                    },
+                    {
+                        "symbol": "DOOM",
+                        "name": "DOOM",
+                        "taxlotId": "1",
+                        "categoryId": "2",
+                        "locked": false,
+                        "costBasis": 8000,
+                        "balance": 5000
+                    }
+
+                ]
+            },
+            {
+                "id": "2-Ca502191",
+                "name": "TAXABLE ACCOUNT 2",
+                "taxabilityType": "T",
+                "clients":[
+                    {
+                        "id": "2",
+                        "name": "Gamze"
+                    }
+                ],
+                "locked": false,
+                "heldaway": false,
+                "excluded": false,
+                "holdings": [
+                    {
+                        "symbol": "ibm",
+                        "name": "ibm",
+                        "taxlotId": 1,
+                        "categoryId": "1",
+                        "purchaseDate": "2018-07-25",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 5000
+                    },
+                    {
+                        "symbol": "ibm",
+                        "name": "ibm",
+                        "taxlotId": 2,
+                        "categoryId": "1",
+                        "purchaseDate": "2022-07-25",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 10000
+                    },
+                    {
+                        "symbol": "KAMAA",
+                        "name": "KAMAA",
+                        "taxlotId": "1",
+                        "purchaseDate": "2018-07-25",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 4000,
+                        "allocation":[
+                            {
+                                "categoryId": "6",
+                                "weight": 1
+                            }
+                        ]
+                    },
+                    {
+                        "symbol": "KAMAA",
+                        "name": "KAMAA",
+                        "taxlotId": "2",
+                        "locked": true,
+                        "costBasis": 7000,
+                        "balance": 4000,
+                        "allocation":[
+                            {
+                                "categoryId": "6",
+                                "weight": 1
+                            }
+                        ]
+                    },
+                    {
+                        "symbol": "KAMAA",
+                        "name": "KAMAA",
+                        "taxlotId": "3",
+                        "purchaseDate": "2001-07-25",
+                        "locked": false,
+                        "costBasis": 10000,
+                        "balance": 15000,
+                        "allocation":[
+                            {
+                                "categoryId": "6",
+                                "weight": 1
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "3-Ca502191",
+                "name": "TAX DEFERRED ACCOUNT 1",
+                "taxabilityType": "D",
+                "clients":[
+                    {
+                        "id": "2",
+                        "name": "Gamze"
+                    }
+                ],
+                "locked": true,
+                "heldaway": false,
+                "excluded": false,
+                "holdings": [
+                    {
+                        "symbol": "MSFT",
+                        "name": "MSFT",
+                        "categoryId": "5",
+                        "taxlotId": 1,
+                        "purchaseDate": "2018-07-25",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 5000
+                    },
+                    {
+                        "symbol": "MSFT",
+                        "name": "MSFT",
+                        "categoryId": "5",
+                        "taxlotId": 2,
+                        "purchaseDate": "2001-07-25",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 15000
+                    },
+                    {
+                        "symbol": "MSFT",
+                        "name": "MSFT",
+                        "categoryId": "5",
+                        "taxlotId": 3,
+                        "purchaseDate": "2018-07-25",
+                        "locked": false,
+                        "costBasis": 15000,
+                        "balance": 9000
+                    },
+                    {
+                        "symbol": "MSFT",
+                        "name": "MSFT",
+                        "categoryId": "5",
+                        "taxlotId": 4,
+                        "purchaseDate": "2001-07-25",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 15000
+                    }
+                ]
+            },
+            {
+                "id": "4-Ca502191",
+                "name": "TAX DEFERRED ACCOUNT 2",
+                "taxabilityType": "D",
+                "clients":[
+                    {
+                        "id": "2",
+                        "name": "Gamze"
+                    }
+                ],
+                "locked": false,
+                "heldaway": false,
+                "excluded": true,
+                "holdings": [
+                    {
+                        "symbol": "MSFT",
+                        "name": "MSFT",
+                        "categoryId": "5",
+                        "taxlotId": "1",
+                        "purchaseDate": "2018-07-25",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 5000
+                    },
+                    {
+                        "symbol": "MSFT",
+                        "name": "MSFT",
+                        "categoryId": "5",
+                        "taxlotId": "2",
+                        "purchaseDate": "2001-07-25",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 15000
+                    },
+                    {
+                        "symbol": "MSFT",
+                        "name": "MSFT",
+                        "categoryId": "5",
+                        "taxlotId": "3",
+                        "purchaseDate": "2018-07-25",
+                        "locked": false,
+                        "costBasis": 15000,
+                        "balance": 9000
+                    },
+                    {
+                        "symbol": "MSFT",
+                        "name": "MSFT",
+                        "categoryId": "5",
+                        "taxlotId": "4",
+                        "purchaseDate": "2001-07-25",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 15000
+                    },
+                    {
+                        "symbol": "AFAS",
+                        "name": "AFAS",
+                        "categoryId": "9",
+                        "taxlotId": "1",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 5000
+                    },
+                    {
+                        "symbol": "AFAS",
+                        "name": "AFAS",
+                        "categoryId": "9",
+                        "taxlotId": "2",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 15000
+                    },
+                    {
+                        "symbol": "AFAS",
+                        "name": "AFAS",
+                        "categoryId": "9",
+                        "taxlotId": "3",
+                        "locked": true,
+                        "costBasis": 15000,
+                        "balance": 9000
+                    },
+                    {
+                        "symbol": "AFAS",
+                        "name": "AFAS",
+                        "categoryId": "9",
+                        "taxlotId": "4",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 15000
+                    },
+                    {
+                        "symbol": "Yozgat",
+                        "name": "Yozgat",
+                        "categoryId": "2",
+                        "taxlotId": "1",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 5000
+                    },
+                    {
+                        "symbol": "Yozgat",
+                        "name": "Yozgat",
+                        "categoryId": "2",
+                        "taxlotId": "2",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 15000
+                    },
+                    {
+                        "symbol": "Yozgat",
+                        "name": "Yozgat",
+                        "categoryId": "2",
+                        "taxlotId": "3",
+                        "locked": true,
+                        "costBasis": 15000,
+                        "balance": 9000
+                    },
+                    {
+                        "symbol": "Yozgat",
+                        "name": "Yozgat",
+                        "categoryId": "2",
+                        "taxlotId": "4",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 15000
+                    }
+                ]
+            },
+            {
+                "id": "5-aa502195",
+                "name": "TAXABLE ACCOUNT 3",
+                "taxabilityType": "T",
+                "locked": false,
+                "heldaway": false,
+                "clients":[
+                    {
+                        "id": "1",
+                        "name": "Hasan"
+                    }
+                ],
+                "holdings": [
+                    {
+                        "symbol": "AAPL",
+                        "name": "AAPL",
+                        "taxlotId": "1",
+                        "purchaseDate": "2018-07-25",
+                        "categoryId": "1",
+                        "locked": true,
+                        "costBasis": 5000,
+                        "balance": 10000
+                    },
+                    {
+                        "symbol": "NVDA",
+                        "name": "NVDA",
+                        "taxlotId": "1",
+                        "purchaseDate": "2015-07-25",
+                        "categoryId": "2",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 10000
+                    },
+                    {
+                        "symbol": "NVDA",
+                        "name": "NVDA",
+                        "taxlotId": "2",
+                        "categoryId": "2",
+                        "locked": false,
+                        "costBasis": 1000,
+                        "balance": 5000
+                    },
+                    {
+                        "symbol": "NVDA",
+                        "name": "NVDA",
+                        "taxlotId": "3",
+                        "categoryId": "2",
+                        "locked": false,
+                        "costBasis": 8000,
+                        "balance": 5000
+                    },
+                    {
+                        "symbol": "KAMAA",
+                        "name": "KAMAA",
+                        "taxlotId": "1",
+                        "purchaseDate": "2018-07-25",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 4000,
+                        "allocation":[
+                            {
+                                "categoryId": "6",
+                                "weight": 1
+                            }
+                        ]
+                    },
+                    {
+                        "symbol": "KAMAA",
+                        "name": "KAMAA",
+                        "taxlotId": "2",
+                        "locked": true,
+                        "costBasis": 7000,
+                        "balance": 4000,
+                        "allocation":[
+                            {
+                                "categoryId": "6",
+                                "weight": 1
+                            }
+                        ]
+                    },
+                    {
+                        "symbol": "KAMAA",
+                        "name": "KAMAA",
+                        "taxlotId": "3",
+                        "purchaseDate": "2001-07-25",
+                        "locked": false,
+                        "costBasis": 10000,
+                        "balance": 15000,
+                        "allocation":[
+                            {
+                                "categoryId": "6",
+                                "weight": 1
+                            }
+                        ]
+                    },
+                    {
+                        "symbol": "DOOM",
+                        "name": "DOOM",
+                        "taxlotId": "1",
+                        "categoryId": "2",
+                        "locked": false,
+                        "costBasis": 8000,
+                        "balance": 5000
+                    }
+
+                ]
+            },
+            {
+                "id": "6-Ca502191",
+                "name": "TAXABLE ACCOUNT 4",
+                "taxabilityType": "T",
+                "clients":[
+                    {
+                        "id": "2",
+                        "name": "Gamze"
+                    }
+                ],
+                "locked": false,
+                "heldaway": false,
+                "excluded": false,
+                "holdings": [
+                    {
+                        "symbol": "ibm",
+                        "name": "ibm",
+                        "taxlotId": 1,
+                        "categoryId": "1",
+                        "purchaseDate": "2018-07-25",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 5000
+                    },
+                    {
+                        "symbol": "ibm",
+                        "name": "ibm",
+                        "taxlotId": 2,
+                        "categoryId": "1",
+                        "purchaseDate": "2022-07-25",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 10000
+                    },
+                    {
+                        "symbol": "KAMAA",
+                        "name": "KAMAA",
+                        "taxlotId": "1",
+                        "purchaseDate": "2018-07-25",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 4000,
+                        "allocation":[
+                            {
+                                "categoryId": "6",
+                                "weight": 1
+                            }
+                        ]
+                    },
+                    {
+                        "symbol": "KAMAA",
+                        "name": "KAMAA",
+                        "taxlotId": "2",
+                        "locked": true,
+                        "costBasis": 7000,
+                        "balance": 4000,
+                        "allocation":[
+                            {
+                                "categoryId": "6",
+                                "weight": 1
+                            }
+                        ]
+                    },
+                    {
+                        "symbol": "KAMAA",
+                        "name": "KAMAA",
+                        "taxlotId": "3",
+                        "purchaseDate": "2001-07-25",
+                        "locked": false,
+                        "costBasis": 10000,
+                        "balance": 15000,
+                        "allocation":[
+                            {
+                                "categoryId": "6",
+                                "weight": 1
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "7-Ca502191",
+                "name": "TAX Free ACCOUNT 1",
+                "taxabilityType": "F",
+                "clients":[
+                    {
+                        "id": "2",
+                        "name": "Gamze"
+                    }
+                ],
+                "locked": true,
+                "heldaway": false,
+                "excluded": false,
+                "holdings": [
+                    {
+                        "symbol": "MSFT",
+                        "name": "MSFT",
+                        "categoryId": "5",
+                        "taxlotId": 1,
+                        "purchaseDate": "2018-07-25",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 5000
+                    },
+                    {
+                        "symbol": "MSFT",
+                        "name": "MSFT",
+                        "categoryId": "5",
+                        "taxlotId": 2,
+                        "purchaseDate": "2001-07-25",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 15000
+                    },
+                    {
+                        "symbol": "MSFT",
+                        "name": "MSFT",
+                        "categoryId": "5",
+                        "taxlotId": 3,
+                        "purchaseDate": "2018-07-25",
+                        "locked": false,
+                        "costBasis": 15000,
+                        "balance": 9000
+                    },
+                    {
+                        "symbol": "MSFT",
+                        "name": "MSFT",
+                        "categoryId": "5",
+                        "taxlotId": 4,
+                        "purchaseDate": "2001-07-25",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 15000
+                    }
+                ]
+            },
+            {
+                "id": "8-Ca502191",
+                "name": "TAX Free ACCOUNT 2",
+                "taxabilityType": "F",
+                "clients":[
+                    {
+                        "id": "2",
+                        "name": "Gamze"
+                    }
+                ],
+                "locked": false,
+                "heldaway": false,
+                "excluded": true,
+                "holdings": [
+                    {
+                        "symbol": "MSFT",
+                        "name": "MSFT",
+                        "categoryId": "5",
+                        "taxlotId": "1",
+                        "purchaseDate": "2018-07-25",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 5000
+                    },
+                    {
+                        "symbol": "MSFT",
+                        "name": "MSFT",
+                        "categoryId": "5",
+                        "taxlotId": "2",
+                        "purchaseDate": "2001-07-25",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 15000
+                    },
+                    {
+                        "symbol": "MSFT",
+                        "name": "MSFT",
+                        "categoryId": "5",
+                        "taxlotId": "3",
+                        "purchaseDate": "2018-07-25",
+                        "locked": false,
+                        "costBasis": 15000,
+                        "balance": 9000
+                    },
+                    {
+                        "symbol": "MSFT",
+                        "name": "MSFT",
+                        "categoryId": "5",
+                        "taxlotId": "4",
+                        "purchaseDate": "2001-07-25",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 15000
+                    },
+                    {
+                        "symbol": "AFAS",
+                        "name": "AFAS",
+                        "categoryId": "9",
+                        "taxlotId": "1",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 5000
+                    },
+                    {
+                        "symbol": "AFAS",
+                        "name": "AFAS",
+                        "categoryId": "9",
+                        "taxlotId": "2",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 15000
+                    },
+                    {
+                        "symbol": "AFAS",
+                        "name": "AFAS",
+                        "categoryId": "9",
+                        "taxlotId": "3",
+                        "locked": true,
+                        "costBasis": 15000,
+                        "balance": 9000
+                    },
+                    {
+                        "symbol": "AFAS",
+                        "name": "AFAS",
+                        "categoryId": "9",
+                        "taxlotId": "4",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 15000
+                    },
+                    {
+                        "symbol": "Yozgat",
+                        "name": "Yozgat",
+                        "categoryId": "2",
+                        "taxlotId": "1",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 5000
+                    },
+                    {
+                        "symbol": "Yozgat",
+                        "name": "Yozgat",
+                        "categoryId": "2",
+                        "taxlotId": "2",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 15000
+                    },
+                    {
+                        "symbol": "Yozgat",
+                        "name": "Yozgat",
+                        "categoryId": "2",
+                        "taxlotId": "3",
+                        "locked": true,
+                        "costBasis": 15000,
+                        "balance": 9000
+                    },
+                    {
+                        "symbol": "Yozgat",
+                        "name": "Yozgat",
+                        "categoryId": "2",
+                        "taxlotId": "4",
+                        "locked": false,
+                        "costBasis": 5000,
+                        "balance": 15000
+                    }
+                ]
+            }
+        ]
+    }
+}

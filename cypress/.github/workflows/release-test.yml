@@ -1,0 +1,388 @@
+name : Automated test release
+
+concurrency:
+  group: Release-Test-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: write  # This is required for actions/checkout
+      
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment for tests (Docker/QA18/QA19)'
+        default: "Docker"
+        required: false
+  repository_dispatch:
+    types: [trigger-workflow]
+
+# Default that will run on branch push
+env:
+  BRANCH_NAME: main
+  ENVIRONMENT_NAME: Docker
+  CYPRESS_baseHREF: /
+  CYPRESS_frontendUrl: http://localhost:3001
+  CYPRESS_backendUrl: http://localhost:7050
+  CYPRESS_devIdP: http://localhost:7080
+  CYPRESS_devIdpPlans: http://localhost:7080/Plan
+  CYPRESS_devAWSPA: Docker - ProposalAdvantage
+  CYPRESS_devAWSPI: Docker - PlanImplementation
+  CYPRESS_devAWSTSW: Docker - TaxSmartWithdrawal
+
+jobs:
+  build:
+    name: Build image
+    runs-on: ["${{ (( github.event_name == 'push' || inputs.environment == 'Docker' || github.event.client_payload.environment == 'Docker') && 'ubuntu-latest')  || 'self-hosted'}}"] 
+
+    steps:
+    
+    - name: Set current date as env variable
+      run: echo "NOW=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+    
+    - name: Sets env vars for release
+      if: ${{ inputs.environment == 'Docker' || github.event.client_payload.environment == 'Docker' }}
+      run: |
+        echo "BRANCH_NAME=main" >> $GITHUB_ENV
+        echo "ENVIRONMENT_NAME=Docker" >> $GITHUB_ENV
+        echo "CYPRESS_baseHREF=/" >> $GITHUB_ENV
+        echo "CYPRESS_frontendUrl=http://localhost:3001" >> $GITHUB_ENV
+        echo "CYPRESS_backendUrl=http://localhost:7050" >> $GITHUB_ENV
+        echo "CYPRESS_devIdP=http://localhost:7080" >> $GITHUB_ENV
+        echo "CYPRESS_devIdpPlans=http://localhost:7080/Plan" >> $GITHUB_ENV
+        echo "CYPRESS_devAWSPA=Docker - ProposalAdvantage" >> $GITHUB_ENV
+        echo "CYPRESS_devAWSPI=Docker - PlanImplementation" >> $GITHUB_ENV
+        echo "CYPRESS_devAWSTSW=Docker - TaxSmartWithdrawal" >> $GITHUB_ENV
+        
+    - name: Sets env vars for release
+      if: ${{ github.event.client_payload.branch_name == '1.18' }}
+      run: |
+        echo "BRANCH_NAME=release/1.18" >> $GITHUB_ENV
+        
+    - name: Sets env vars for release
+      if: ${{ inputs.environment == 'QA19' || github.event.client_payload.environment == 'QA19' }}
+      run: |
+        echo "BRANCH_NAME=main" >> $GITHUB_ENV
+        echo "ENVIRONMENT_NAME=QA19" >> $GITHUB_ENV
+        echo "CYPRESS_baseHREF=/ssa19/pa/" >> $GITHUB_ENV
+        echo "CYPRESS_frontendUrl=https://app-aws-qa.lifeyield.com/ssa19/pa" >> $GITHUB_ENV
+        echo "CYPRESS_backendUrl=https://pa-backend-ssa19-app-aws-qa.lifeyield.com" >> $GITHUB_ENV
+        echo "CYPRESS_devIdP=https://dev-aws.lifeyield.com/" >> $GITHUB_ENV
+        echo "CYPRESS_devIdpPlans=https://dev-aws.lifeyield.com/Plan" >> $GITHUB_ENV
+        echo "CYPRESS_devAWSPA=AWS - QA19 - ProposalAdvantage" >> $GITHUB_ENV
+        echo "CYPRESS_devAWSPI=AWS - QA19 - PlanImplementation" >> $GITHUB_ENV
+        echo "CYPRESS_devAWSTSW=AWS - QA19 - TaxSmartWithdrawal" >> $GITHUB_ENV
+        
+    - name: Sets env vars for release
+      if: ${{ inputs.environment == 'QA18' || github.event.client_payload.environment == 'QA18' }}
+      run: |
+        echo "BRANCH_NAME=release/1.18" >> $GITHUB_ENV
+        echo "ENVIRONMENT_NAME=QA18" >> $GITHUB_ENV
+        echo "CYPRESS_baseHREF=/ssa18/pa/" >> $GITHUB_ENV
+        echo "CYPRESS_frontendUrl=https://app-aws-qa.lifeyield.com/ssa18/pa" >> $GITHUB_ENV
+        echo "CYPRESS_backendUrl=https://pa-backend-ssa18-app-aws-qa.lifeyield.com" >> $GITHUB_ENV
+        echo "CYPRESS_devIdP=https://dev-aws.lifeyield.com/" >> $GITHUB_ENV
+        echo "CYPRESS_devIdpPlans=https://dev-aws.lifeyield.com/Plan" >> $GITHUB_ENV
+        echo "CYPRESS_devAWSPA=AWS - QA18 - ProposalAdvantage" >> $GITHUB_ENV
+        echo "CYPRESS_devAWSPI=AWS - QA18 - PlanImplementation" >> $GITHUB_ENV
+        echo "CYPRESS_devAWSTSW=AWS - QA18 - TaxSmartWithdrawal" >> $GITHUB_ENV
+        
+    - name: Check out repository code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ env.BRANCH_NAME }}
+        fetch-depth: 0
+        # token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+
+
+    - name: Configure AWS credentials
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' }}
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-region: us-east-1
+        role-to-assume: arn:aws:iam::707908177354:role/ly-developer-github-action
+        role-duration-seconds: 3600
+
+    - name: Login to Amazon ECR
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' }}
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+      
+    - name: Define functions for waiting on containers
+      run: |
+        cat << 'EOF' > $GITHUB_WORKSPACE/functions.sh
+        function wait_until_containers_running {
+          local project_name=$1
+          local time_limit_seconds=$2
+          local retry_interval_seconds=$3
+          
+          local retries=0
+          local max_retries=$(( time_limit_seconds / retry_interval_seconds ))
+          
+          while [[ $retries -lt $max_retries ]]; do
+            echo "Waiting until containers are ready - Attempt $((retries+1))/$max_retries"
+            sleep $retry_interval_seconds
+            ready_count=$(docker ps --filter label=com.docker.compose.project=${project_name} --format '{{.ID}} {{.Status}}' | awk '{if ($2 ~ /Up/ && $0 !~ /health: starting/) {print $1;}}' | wc -l)
+            total_count=$(docker ps --filter label=com.docker.compose.project=${project_name} -a -q | wc -l)
+            if [[ $ready_count -eq $total_count ]]; then
+              break
+            fi
+            retries=$((retries+1))
+          done
+          if [[ $retries -eq $max_retries ]]; then
+            echo "Containers in ${project_name} did not start up within the allotted time."
+            docker ps --filter label=com.docker.compose.project=${project_name}
+            exit 1
+          fi
+        }
+        
+        function wait_until_containers_finish {
+          local project_name=$1
+          local time_limit_seconds=$2
+          local retry_interval_seconds=$3
+          
+          local retries=0
+          local max_retries=$(( time_limit_seconds / retry_interval_seconds ))
+          
+          # while finished containers < total containers and we still have more tries left
+          while [[ $(docker ps --filter label=com.docker.compose.project=${project_name} --filter "exited=0" -a -q | wc -l) -lt \
+          $(docker ps --filter label=com.docker.compose.project=${project_name} -a -q | wc -l) && $retries -lt $max_retries ]]; do
+            echo "Waiting for containers to exit successfully - Attempt $((retries+1))/$max_retries"
+            sleep $retry_interval_seconds
+            if [[ $(docker ps --filter label=com.docker.compose.project=${project_name} --filter "exited=1" -a -q | wc -l) -gt 0 ]]; then
+              echo "ERROR: A container exited with status code 1"
+              docker ps --filter label=com.docker.compose.project=${project_name} -a
+              exit 1
+            fi
+            retries=$((retries+1))
+          done
+          # -gt instead of -eq in case condition is satisfied on loop's final attempt
+          if [[ $retries -gt $max_retries ]]; then
+            echo "Containers did not finish within the allotted time."
+            docker ps --filter label=com.docker.compose.project=${project_name} -a
+            exit 1
+          fi
+        }
+        EOF
+      shell: bash
+
+    - name: Docker pull
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' && env.BRANCH_NAME == 'main' }}
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG_ALIAS: latest-qa-AMD
+        #IMAGE_TAG_ALIAS: latest-qa-ARM
+      run: |
+        docker pull $ECR_REGISTRY/lifeyield-audit-entities-installer:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-audit-service:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-identity-provider:latest-qa-AMD --quiet
+        docker pull $ECR_REGISTRY/lifeyield-core-entities-installer:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-core-service:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/keycloak-installer:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-portfolio-entities-installer:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-portfolio-service:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-proposal-entities-installer:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-proposal-service:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/proposal-advantage-backend:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/proposal-advantage-widget:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-smtp-entities-installer:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-smtp-service:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-socialsecurity-service:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-subscription-entities-installer:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-subscription-service:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/web-api:$IMAGE_TAG_ALIAS --quiet
+        aws s3 cp s3://build-developer/latest-qa ./web/Developer --recursive --only-show-errors
+        aws s3 cp s3://build-proposaladvantagefrontend/latest-qa ./web/ProposalAdvantageFrontend --recursive --only-show-errors
+        aws s3 cp s3://build-planimplementation/latest-qa ./web/PlanImplementation --recursive --only-show-errors
+        aws s3 cp s3://build-taxsmartwithdrawal/latest-qa ./web/TaxSmartWithdrawal --recursive --only-show-errors
+        aws s3 cp s3://build-keycloak-imports/latest-qa ./web/Keycloak --recursive --only-show-errors
+        aws s3 cp s3://build-jsreports-imports/latest-qa ./reports --recursive --only-show-errors
+        cp  ./Deploy/Configs/proposaladvantagefrontend.js ./web/ProposalAdvantageFrontend/config.js
+        cp  ./Deploy/Configs/planimplementation.js ./web/PlanImplementation/config.js
+        cp  ./Deploy/Configs/taxsmartwithdrawal.js ./web/TaxSmartWithdrawal/config.js
+
+    - name: Docker pull
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' && env.BRANCH_NAME == 'release/1.18' }}
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG_ALIAS: latest-qa18-AMD
+        #IMAGE_TAG_ALIAS: latest-qa18-ARM
+      run: |
+        docker pull $ECR_REGISTRY/lifeyield-audit-entities-installer:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-audit-service:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-identity-provider:latest-qa-AMD --quiet
+        docker pull $ECR_REGISTRY/lifeyield-core-entities-installer:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-core-service:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/keycloak-installer:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-portfolio-entities-installer:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-portfolio-service:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-proposal-entities-installer:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-proposal-service:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/proposal-advantage-backend:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/proposal-advantage-widget:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-smtp-entities-installer:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-smtp-service:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-socialsecurity-service:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-subscription-entities-installer:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/lifeyield-subscription-service:$IMAGE_TAG_ALIAS --quiet
+        docker pull $ECR_REGISTRY/web-api:$IMAGE_TAG_ALIAS --quiet
+        aws s3 cp s3://build-developer/latest-qa18 ./web/Developer --recursive --only-show-errors
+        aws s3 cp s3://build-proposaladvantagefrontend/latest-qa18 ./web/ProposalAdvantageFrontend --recursive --only-show-errors
+        aws s3 cp s3://build-planimplementation/latest-qa18 ./web/PlanImplementation --recursive --only-show-errors
+        aws s3 cp s3://build-taxsmartwithdrawal/latest-qa18 ./web/TaxSmartWithdrawal --recursive --only-show-errors
+        aws s3 cp s3://build-keycloak-imports/latest-qa18 ./web/Keycloak --recursive --only-show-errors
+        aws s3 cp s3://build-jsreports-imports/latest-qa18 ./reports --recursive --only-show-errors
+        cp  ./Deploy/Configs/proposaladvantagefrontend.js ./web/ProposalAdvantageFrontend/config.js
+        cp  ./Deploy/Configs/planimplementation.js ./web/PlanImplementation/config.js
+        cp  ./Deploy/Configs/taxsmartwithdrawal.js ./web/TaxSmartWithdrawal/config.js
+        
+    - name: Permission fix
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' }}
+      run: |
+        chmod -R 777 ./reports/*
+        
+    - name: docker network
+      run: docker network create custom_network
+      
+    - name: Build the docker-compose base
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' }}
+      run: docker compose -f ./Deploy/docker-compose-base.yml -p base up --detach
+      
+    - run: docker ps -a
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' }}
+    - name: Wait for containers to start up
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' }}
+      run: |
+        source $GITHUB_WORKSPACE/functions.sh
+        wait_until_containers_running base 40 5
+      
+      shell: bash
+    - run: docker ps
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' }}
+        
+    - name: Build the docker-compose installers
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' }}
+      run: docker compose -f ./Deploy/docker-compose-installers.yml -p installers up --detach
+      
+    - run: docker ps -a
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' }}
+    - name: Wait for containers to finish executing
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' }}
+      run: |
+        source $GITHUB_WORKSPACE/functions.sh
+        wait_until_containers_finish installers 40 5
+      shell: bash
+      
+    - run: docker ps -a
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' }}
+    
+    - name: Build the second round of docker-compose installers
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' }}
+      run: docker compose -f ./Deploy/docker-compose-installers2.yml -p installers2 up --detach
+      
+    - run: docker ps -a
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' }}
+    - name: Wait for containers to finish executing
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' }}
+      run: |
+        source $GITHUB_WORKSPACE/functions.sh
+        wait_until_containers_finish installers2 120 5
+      shell: bash
+      
+    - run: docker ps -a --format 'table {{.ID}}\t{{.Names}}\t{{.Labels}}'
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' }}
+        
+    - name: Build the docker-compose backend
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' }}
+      run: docker compose -f ./Deploy/docker-compose-backend.yml -p backend-react up --detach
+      
+    - name: Build the docker-compose react
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' }}
+      run: docker compose -f ./Deploy/docker-compose-react.yml -p backend-react up --detach
+      
+    - run: docker ps -a 
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' }}
+    - name: Wait for containers to start up
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' }}
+      run: |
+        source $GITHUB_WORKSPACE/functions.sh
+        wait_until_containers_running backend-react 90 5
+      shell: bash
+      
+    - run: docker ps -a
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' }}
+    
+    - name: SeedData
+      if: ${{  env.ENVIRONMENT_NAME == 'Docker' }}
+      run: |
+        docker exec -i postgres psql -U postgres -d Subscription < Deploy/SeedData/Subscription.sql
+        docker exec -i postgres psql -U postgres -d keycloakdb < Deploy/SeedData/Keycloak.sql
+    
+    # - name: npm stuff
+      # run: |
+          # cd Deploy/cypress_real
+          # npm install
+    
+    - name: Build the docker-compose stack to run tests and extract summary
+      env:
+        CYPRESS_baseHREF: ${{ env.CYPRESS_baseHREF }}
+        CYPRESS_frontendUrl: ${{ env.CYPRESS_frontendUrl }}
+        CYPRESS_backendUrl: ${{ env.CYPRESS_backendUrl }}
+        CYPRESS_devIdP: ${{ env.CYPRESS_devIdP }}
+        CYPRESS_devIdpPlans: ${{ env.CYPRESS_devIdpPlans }}
+        CYPRESS_devAWSPA: ${{ env.CYPRESS_devAWSPA }}
+        CYPRESS_devAWSPI: ${{ env.CYPRESS_devAWSPI }}
+        CYPRESS_devAWSTSW: ${{ env.CYPRESS_devAWSTSW }}
+        CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+        COMMIT_INFO_BRANCH: ${{ env.BRANCH_NAME }}
+        COMMIT_INFO_MESSAGE: Automated Test - ${{ env.ENVIRONMENT_NAME }} Environment - ${{ env.NOW }}
+      run: |
+        docker compose -f ./Deploy/docker-compose.yml up --exit-code-from cypress_real | tee test_output.txt
+        bottom_of_output=$(tail -n 20 test_output.txt | tac)
+        summary_line=$(echo "$bottom_of_output" | grep -m 1 -E '✔|✖' | sed 's/\x1b\[[0-9;]*m//g')
+        summary_text=$(echo "$summary_line" | grep -oP '(?<=✖ ).*(?= \d{2}:\d{2})|(?<=✔ ).*(?= \d{2}:\d{2})')
+        echo "TEST_SUMMARY=$summary_text" >> $GITHUB_ENV
+        
+        run_url_line=$(echo "$bottom_of_output" | grep -m 1 -E 'Recorded Run:' | sed 's/\x1b\[[0-9;]*m//g')
+        run_url=$(echo "$run_url_line" | grep -oP '(?<=Recorded Run: ).*')
+        echo "RUN_URL=$run_url" >> $GITHUB_ENV
+    
+    - name: Commit Updates
+      if: ${{  failure() && env.BRANCH_NAME != 'main' && !startsWith(env.BRANCH_NAME, 'release/') }}
+      run: |
+          git pull --ff
+          git add ./cypress/screenshots/*
+          git config --local user.name github-actions
+          git config --local user.email github-actions@lifeyield.com
+          git commit -m "Cypress Test"
+          git push
+    
+    - name: Send email
+      if: ${{ (success() || failure()) && github.event_name == 'repository_dispatch' && (env.BRANCH_NAME == 'main' || startsWith(env.BRANCH_NAME, 'release/')) }}
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp-mail.outlook.com
+        server_port: ${{ (( github.event_name == 'push' || inputs.environment == 'Docker' || github.event.client_payload.environment == 'Docker') && 25)  || 587}}
+        secure: false
+        username: ${{secrets.MAIL_USERNAME}}
+        password: ${{secrets.MAIL_PASSWORD}}
+        subject: Scheduled Cypress Test Results
+        to: operations@lifeyield.com,developers@lifeyield.com,bilintek@lifeyield.com,qa@lifeyield.com,savitha.gopu@lifeyield.com
+        from: no-reply@lifeyield.com
+        html_body: |
+            <p>Scheduled Cypress testing has finished.</p>
+            <p>Results:<br>${{ env.TEST_SUMMARY }}</p>
+            <p>Environment:<br>${{ env.ENVIRONMENT_NAME }}</p>
+            <p>Branch:<br>${{ env.BRANCH_NAME }}</p>
+            <p>For more information, see run details at:<br>${{ env.RUN_URL }}</p>
+            <p>Thank you,</p>
+            <p>Development</p>
+            
+        content_type: text/html
+        convert_markdown: true
+        ignore_cert: true
+        priority: normal

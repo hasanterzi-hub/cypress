@@ -1,0 +1,45 @@
+Step 1) set cmd path to CypressAutomation repository
+cd C:\source\Git\CypressAutomation
+
+Step 2) Login to aws and pull all release to local docker/folders.  Note below is configured with the aws profile "mfa" which should be set in C:\Users\[user]\.aws\credentials
+aws ecr get-login-password --profile mfa --region us-east-1 | docker login --username AWS --password-stdin https://707908177354.dkr.ecr.us-east-1.amazonaws.com
+docker pull 707908177354.dkr.ecr.us-east-1.amazonaws.com/lifeyield-audit-entities-installer:latest-qa-AMD --quiet
+docker pull 707908177354.dkr.ecr.us-east-1.amazonaws.com/lifeyield-audit-service:latest-qa-AMD --quiet
+docker pull 707908177354.dkr.ecr.us-east-1.amazonaws.com/lifeyield-identity-provider:latest-qa-AMD --quiet
+docker pull 707908177354.dkr.ecr.us-east-1.amazonaws.com/lifeyield-core-entities-installer:latest-qa-AMD --quiet
+docker pull 707908177354.dkr.ecr.us-east-1.amazonaws.com/lifeyield-core-service:latest-qa-AMD --quiet
+docker pull 707908177354.dkr.ecr.us-east-1.amazonaws.com/keycloak-installer:latest-qa-AMD --quiet
+docker pull 707908177354.dkr.ecr.us-east-1.amazonaws.com/lifeyield-portfolio-entities-installer:latest-qa-AMD --quiet
+docker pull 707908177354.dkr.ecr.us-east-1.amazonaws.com/lifeyield-portfolio-service:latest-qa-AMD --quiet
+docker pull 707908177354.dkr.ecr.us-east-1.amazonaws.com/lifeyield-proposal-entities-installer:latest-qa-AMD --quiet
+docker pull 707908177354.dkr.ecr.us-east-1.amazonaws.com/lifeyield-proposal-service:latest-qa-AMD --quiet
+docker pull 707908177354.dkr.ecr.us-east-1.amazonaws.com/proposal-advantage-backend:latest-qa-AMD --quiet
+docker pull 707908177354.dkr.ecr.us-east-1.amazonaws.com/proposal-advantage-widget:latest-qa-AMD --quiet
+docker pull 707908177354.dkr.ecr.us-east-1.amazonaws.com/lifeyield-smtp-entities-installer:latest-qa-AMD --quiet
+docker pull 707908177354.dkr.ecr.us-east-1.amazonaws.com/lifeyield-smtp-service:latest-qa-AMD --quiet
+docker pull 707908177354.dkr.ecr.us-east-1.amazonaws.com/lifeyield-socialsecurity-service:latest-qa-AMD --quiet
+docker pull 707908177354.dkr.ecr.us-east-1.amazonaws.com/lifeyield-subscription-entities-installer:latest-qa-AMD --quiet
+docker pull 707908177354.dkr.ecr.us-east-1.amazonaws.com/lifeyield-subscription-service:latest-qa-AMD --quiet
+docker pull 707908177354.dkr.ecr.us-east-1.amazonaws.com/web-api:latest-qa-AMD --quiet
+aws s3 cp s3://build-developer/latest-qa ./web/Developer --recursive --only-show-errors --profile mfa
+aws s3 cp s3://build-proposaladvantagefrontend/latest-qa ./web/ProposalAdvantageFrontend --recursive --only-show-errors --profile mfa
+aws s3 cp s3://build-planimplementation/latest-qa ./web/PlanImplementation --recursive --only-show-errors --profile mfa
+aws s3 cp s3://build-taxsmartwithdrawal/latest-qa ./web/TaxSmartWithdrawal --recursive --only-show-errors --profile mfa
+aws s3 cp s3://build-keycloak-imports/latest-qa ./web/Keycloak --recursive --only-show-errors --profile mfa
+aws s3 cp s3://build-jsreports-imports/latest-qa ./reports --recursive --only-show-errors --profile mfa
+copy Deploy\Configs\proposaladvantagefrontend.js web\ProposalAdvantageFrontend\config.js /y
+copy Deploy\Configs\planimplementation.js web\PlanImplementation\config.js /y
+copy Deploy\Configs\taxsmartwithdrawal.js web\TaxSmartWithdrawal\config.js /y
+
+Step 3) Deploy full architecture to docker (pause between each step to observe it completes/starts)
+docker network create custom_network
+docker compose -f ./Deploy/docker-compose-base.yml -p base up --detach
+docker compose -f ./Deploy/docker-compose-installers.yml -p installers up --detach
+docker compose -f ./Deploy/docker-compose-installers2.yml -p installers2 up --detach
+docker compose -f ./Deploy/docker-compose-backend.yml -p backend-react up --detach
+docker compose -f ./Deploy/docker-compose-react.yml -p backend-react up --detach
+docker exec -i postgres psql -U postgres -d Subscription < Deploy/SeedData/Subscription.sql
+docker exec -i postgres psql -U postgres -d keycloakdb < Deploy/SeedData/Keycloak.sql
+
+Step 4) Run Cypress code and review results
+docker compose -f ./Deploy/docker-compose-debug.yml up --exit-code-from cypress_real

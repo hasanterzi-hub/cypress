@@ -1,0 +1,17 @@
+{
+  "users": [
+    {
+      "firstName": "Joseph",
+      "lastName": "Dynes",
+      "email": "joseph.dynes@lifeyield.com",
+      "company": "LifeYield",
+      "address_line_1": "100 Florence Ave",
+      "address_line_2": "Line 2",
+      "phone": "201-920-4281",
+      "city": "Attleboro",
+      "state": "Massachusetts",
+      "zipCode": "02703",
+      "password": "Mark2009!"
+    }
+  ]
+}
